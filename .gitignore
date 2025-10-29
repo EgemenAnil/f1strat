@@ -1,0 +1,11 @@
+# Önbellek dosyalarını görmezden gel
+cache/
+
+# CSV dosyalarını görmezden gel
+*.csv
+
+# Python sanal ortam klasörünü görmezden gel
+f1-env/
+
+# Mac'e özel sistem dosyaları
+.DS_Store
