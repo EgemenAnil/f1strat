@@ -71,8 +71,31 @@ def process_session_data(year: int, track: str, session_type: str, script_dir: s
         Exception: If there's an error in fetching or processing data
     """
     try:
-        print(f"\nLoading {year} {track} GP - '{session_type}' session data...")
+        print(f"\nSearching for {year} {track} GP - '{session_type}' session...")
         session = fastf1.get_session(year, track, session_type)
+        
+        # Validate BEFORE loading: check if FastF1 found the correct event
+        event_name = session.event.get('EventName', 'Unknown')
+        event_location = session.event.get('Location', 'Unknown')
+        event_country = session.event.get('Country', 'Unknown')
+        
+        print(f"\n⚠️ found: {event_name}")
+        print(f"   Location: {event_location}, {event_country}")
+        print(f"   Round: {session.event.get('RoundNumber', 'N/A')}")
+        
+        # Check if the found event matches user's request
+        user_track_lower = track.lower().replace(' ', '')
+        found_event_text = f"{event_name} {event_location} {event_country}".lower().replace(' ', '')
+        
+        # Simple check: is the user's track name somewhere in the event info?
+        if user_track_lower not in found_event_text:
+            print(f"\n❌ WARNING: The track you requested ('{track}') does not match the found event!")
+            confirm = input(f"\nDo you want to continue with '{event_name}' instead? (yes/no): ").lower()
+            if confirm not in ['yes', 'y']:
+                print("Operation cancelled by user.")
+                raise Exception("User cancelled - event mismatch")
+        
+        print(f"\n✅ Confirmed: Loading {event_name}...")
         session.load()
         
         # Extract and clean lap data
@@ -86,9 +109,9 @@ def process_session_data(year: int, track: str, session_type: str, script_dir: s
         df_laps = df_laps.dropna(subset=['TyreLife', 'LapTime'])
         df_laps['TyreLife'] = df_laps['TyreLife'].astype(int)
         
-        # Create output file path
-        safe_track_name = track.replace(' ', '_')
-        file_name = f"{year}_{safe_track_name}_{session_type}_laps_clean.csv"
+        # Create output file path using the ACTUAL event name (not user input)
+        actual_event_name = session.event.get('EventName', track).replace(' ', '_')
+        file_name = f"{year}_{actual_event_name}_{session_type}_laps_clean.csv"
         output_path = os.path.join(script_dir, file_name)
         
         # Save processed data
