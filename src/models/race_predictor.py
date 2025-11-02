@@ -10,11 +10,26 @@ import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import xgboost as xgb
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
+
+# Optional: XGBoost (requires libomp on Mac)
+try:
+    import xgboost as xgb
+    XGBOOST_AVAILABLE = True
+except ImportError as e:
+    XGBOOST_AVAILABLE = False
+    print(f"Warning: XGBoost not available: {e}")
+    print("XGBoost models will be disabled. Basic models will still work.")
+
+# Optional: PyTorch (for neural networks)
+try:
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    from torch.utils.data import Dataset, DataLoader
+    PYTORCH_AVAILABLE = True
+except ImportError:
+    PYTORCH_AVAILABLE = False
+    print("Warning: PyTorch not available. Neural network models disabled.")
 
 
 class LapTimeDataset(Dataset):

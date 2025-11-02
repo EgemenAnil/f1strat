@@ -60,13 +60,32 @@ python app.py
 ### Prerequisites
 - Python 3.8+
 - Virtual environment (recommended)
+- **Mac users**: OpenMP library for XGBoost
 
 ### Quick Setup
 
 ```bash
 # Clone repository
+git clone https://github.com/EgemenAnil/f1strat.git
 cd f1strat
 
+# Mac users: Install OpenMP for XGBoost (optional but recommended)
+brew install libomp
+
+# Run the application (auto-setup on first run)
+python3 app.py
+```
+
+The setup wizard will:
+1. Check Python version
+2. Offer to install dependencies automatically
+3. Create `.env` file
+4. Prompt for OpenWeatherMap API key
+5. Verify installation
+
+### Manual Setup (if preferred)
+
+```bash
 # Create virtual environment
 python -m venv f1-env
 
@@ -76,7 +95,7 @@ source f1-env/bin/activate  # macOS/Linux
 f1-env\Scripts\activate  # Windows
 
 # Install dependencies
-pip install -r requirements_new.txt
+pip install -r requirements.txt
 
 # Set up environment variables
 cp .env.example .env
@@ -87,16 +106,30 @@ cp .env.example .env
 1. Go to https://openweathermap.org/api
 2. Sign up for free account
 3. Get API key from dashboard
-4. Add to `.env` file
+4. Add via setup wizard or manually to `.env` file
 
 ## Usage
 
 ### Quick Start: Predict Next Race
 
 ```bash
-# Predict the upcoming F1 race
-python predict_race.py
+# Simply run the application
+python3 app.py
+
+# Or with specific options:
+python3 app.py --help    # Show help
+python3 app.py --setup   # Run setup wizard
+python3 app.py --test    # Test installation
 ```
+
+The application will automatically:
+1. Detect the next upcoming F1 race
+2. Fetch real-time weather forecast
+3. Analyze track characteristics
+4. Calculate crash/safety car probabilities
+5. Generate 194+ pit stop strategies
+6. Recommend optimal strategy
+7. Save results to JSON file
 
 This will:
 1. ✅ Auto-detect next F1 race
