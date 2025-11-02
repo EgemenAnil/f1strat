@@ -12,6 +12,21 @@ import requests
 import os
 from pathlib import Path
 
+# Try to load python-dotenv, fallback to manual .env parsing if not available
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # Fallback: manually load .env file if python-dotenv is not installed
+    env_file = Path('.env')
+    if env_file.exists():
+        with open(env_file) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip()
+
 
 class F1DataFetcher:
     """Enhanced F1 data fetcher with weather and track data integration."""
@@ -224,6 +239,12 @@ class F1DataFetcher:
             forecasts = data.get('list', [])
             race_forecast = None
             min_time_diff = float('inf')
+            
+            # Convert race_date to datetime if it's a Timestamp and remove timezone
+            if hasattr(race_date, 'to_pydatetime'):
+                race_date = race_date.to_pydatetime()
+            if hasattr(race_date, 'tzinfo') and race_date.tzinfo is not None:
+                race_date = race_date.replace(tzinfo=None)
             
             for forecast in forecasts:
                 forecast_time = datetime.fromtimestamp(forecast['dt'])
