@@ -18,6 +18,10 @@ class TeamStrategyAnalyzer:
     
     def __init__(self, cache_dir: str = './cache'):
         """Initialize with FastF1 cache"""
+        import os
+        # Create cache directory if it doesn't exist
+        os.makedirs(cache_dir, exist_ok=True)
+        
         fastf1.Cache.enable_cache(cache_dir)
         self.team_profiles = {}
         
