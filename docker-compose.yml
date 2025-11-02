@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  f1strat:
+    build: .
+    container_name: f1-strategy-prediction
+    image: f1strat:v3.1.0
+    
+    environment:
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY:-your_api_key_here}
+      - PYTHONUNBUFFERED=1
+    
+    volumes:
+      # Cache directory (persistent)
+      - ./cache:/app/cache
+      # Models directory (persistent)
+      - ./models:/app/models
+      # Config directory
+      - ./config:/app/config
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+    
+    # Command
+    command: python app.py
+    
+    # Network
+    networks:
+      - f1strat-network
+
+networks:
+  f1strat-network:
+    driver: bridge

@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 """
-🏎️ F1 Race Prediction System v3.1.0 - Main Application
-Complete ML-powered F1 race strategy prediction system
+🏎️ F1 Race Prediction System - Main Application
+Single-file launcher for easy usage
 
 Usage:
-    python app.py                  # Predict next race with enhanced ML
-    python app.py --test           # Run comprehensive system tests
-    python app.py --train          # Train/retrain ML models
-    python app.py --validate       # Validate ML model performance
+    python app.py                  # Predict next race (auto-installs dependencies)
+    python app.py --test           # Run system tests
     python app.py --setup          # First-time setup wizard
-    python app.py --version        # Show version info
     python app.py --help           # Show help
 """
 
@@ -23,16 +20,14 @@ from pathlib import Path
 def check_and_install_dependencies():
     """Check if required packages are installed, install if missing."""
     
-    # Critical packages needed to run (v3.1.0)
+    # Critical packages needed to run
     required_packages = {
-        'pandas': 'pandas>=2.3.0',
-        'numpy': 'numpy>=2.3.0',
+        'pandas': 'pandas>=2.0.0',
+        'numpy': 'numpy>=1.24.0',
         'fastf1': 'fastf1>=3.6.0',
-        'sklearn': 'scikit-learn>=1.7.0',
-        'requests': 'requests>=2.32.0',
-        'dotenv': 'python-dotenv>=1.2.0',
-        'scipy': 'scipy>=1.16.0',
-        'joblib': 'joblib>=1.5.0'
+        'sklearn': 'scikit-learn>=1.3.0',
+        'requests': 'requests>=2.31.0',
+        'dotenv': 'python-dotenv>=1.0.0'
     }
     
     missing_packages = []
@@ -97,8 +92,7 @@ def print_banner():
     """Print application banner."""
     print(f"""
 {Colors.CYAN}{'='*80}
-🏎️  F1 RACE PREDICTION SYSTEM v3.1.0
-    Enhanced ML Ensemble | 83.3% Accuracy | Real 2025 Data
+🏎️  F1 RACE PREDICTION SYSTEM v2.0
 {'='*80}{Colors.ENDC}
 """)
 
@@ -134,21 +128,9 @@ def check_setup():
 
 def run_setup_wizard():
     """Interactive setup wizard."""
-    print(f"{Colors.BOLD}{'='*80}{Colors.ENDC}")
-    print(f"{Colors.BOLD}🔧 F1 STRATEGY PREDICTION - FIRST TIME SETUP WIZARD{Colors.ENDC}")
-    print(f"{Colors.BOLD}{'='*80}{Colors.ENDC}\n")
+    print(f"{Colors.BOLD}🔧 Setup Wizard{Colors.ENDC}\n")
     
-    print(f"{Colors.CYAN}This wizard will help you:{Colors.ENDC}")
-    print("  1. Verify Python version")
-    print("  2. Install required dependencies")
-    print("  3. Configure environment variables")
-    print("  4. Set up OpenWeatherMap API key (optional)")
-    print(f"\n{Colors.YELLOW}Takes ~2-5 minutes{Colors.ENDC}\n")
-    
-    input(f"{Colors.CYAN}Press Enter to continue...{Colors.ENDC}")
-    print()
-    
-    print(f"{Colors.BOLD}Step 1: Checking Python version...{Colors.ENDC}")
+    print("Step 1: Checking Python version...")
     if sys.version_info >= (3, 8):
         print(f"{Colors.GREEN}✓ Python {sys.version.split()[0]} detected{Colors.ENDC}")
     else:
@@ -222,26 +204,17 @@ def run_setup_wizard():
         print(f"{Colors.GREEN}✓ .env file exists{Colors.ENDC}")
     
     # Interactive API key setup
-    print(f"\n{Colors.BOLD}{'='*80}{Colors.ENDC}")
-    print(f"{Colors.BOLD}Step 4: OpenWeatherMap API Key (Optional but Recommended){Colors.ENDC}")
-    print(f"{Colors.BOLD}{'='*80}{Colors.ENDC}")
-    print(f"\n{Colors.CYAN}Why you need this:{Colors.ENDC}")
-    print("  • Get real-time weather forecasts for race predictions")
-    print("  • Improves accuracy for rain/temperature predictions")
-    print("  • 100% FREE (no credit card required)")
-    print(f"\n{Colors.CYAN}How to get your free API key:{Colors.ENDC}")
-    print(f"  1. Visit: {Colors.BOLD}https://openweathermap.org/api{Colors.ENDC}")
-    print(f"  2. Sign up for free account")
-    print(f"  3. Get your API key (takes 1 minute)")
-    print(f"\n{Colors.YELLOW}Note: Without API key, system will use historical weather data{Colors.ENDC}")
+    print(f"\n{Colors.BOLD}Step 4: OpenWeatherMap API Key{Colors.ENDC}")
+    print("Weather forecasts require a free API key from OpenWeatherMap")
+    print(f"{Colors.CYAN}Get your free key: https://openweathermap.org/api{Colors.ENDC}")
     
     # Check if API key already set
     with open(env_path) as f:
         env_content = f.read()
     
     if 'your_api_key_here' in env_content:
-        print(f"\n{Colors.BOLD}Current status:{Colors.ENDC} {Colors.YELLOW}API key not set{Colors.ENDC}")
-        api_key = input(f"\n{Colors.CYAN}Enter your API key (or press Enter to skip for now): {Colors.ENDC}").strip()
+        print(f"\n{Colors.YELLOW}Current: API key not set{Colors.ENDC}")
+        api_key = input(f"\nEnter your API key (or press Enter to skip): {Colors.ENDC}").strip()
         
         if api_key:
             # Update .env file
@@ -275,8 +248,8 @@ def run_setup_wizard():
     return True
 
 def run_tests():
-    """Run comprehensive system tests for v3.1.0."""
-    print(f"{Colors.BOLD}🧪 Running System Tests (v3.1.0){Colors.ENDC}\n")
+    """Run system tests."""
+    print(f"{Colors.BOLD}🧪 Running System Tests{Colors.ENDC}\n")
     
     # Check setup first
     issues = check_setup()
@@ -296,40 +269,9 @@ def run_tests():
         from src.features.track_features import TrackFeatures
         from src.models.strategy_optimizer import StrategyOptimizer
         from src.models.crash_predictor import CrashPredictor
-        print(f"{Colors.GREEN}✓ All core modules imported{Colors.ENDC}\n")
+        print(f"{Colors.GREEN}✓ All modules imported successfully{Colors.ENDC}\n")
         
-        print("Testing v3.1.0 ML components...")
-        try:
-            from train_enhanced_ml import EnhancedMLPredictor
-            ml = EnhancedMLPredictor()
-            if ml.load():
-                print(f"{Colors.GREEN}✓ Enhanced ML model loaded (v3.1.0){Colors.ENDC}")
-            else:
-                print(f"{Colors.YELLOW}⚠️  ML model not trained. Run: python app.py --train{Colors.ENDC}")
-        except Exception as e:
-            print(f"{Colors.YELLOW}⚠️  ML model not available: {e}{Colors.ENDC}")
-        
-        try:
-            from src.models.driver_performance import DriverPerformanceAnalyzer
-            driver_analyzer = DriverPerformanceAnalyzer()
-            if driver_analyzer.load_ratings():
-                print(f"{Colors.GREEN}✓ Driver ratings loaded (21 drivers){Colors.ENDC}")
-            else:
-                print(f"{Colors.YELLOW}⚠️  Driver ratings not available{Colors.ENDC}")
-        except Exception as e:
-            print(f"{Colors.YELLOW}⚠️  Driver analyzer error: {e}{Colors.ENDC}")
-        
-        try:
-            from src.models.team_strategy_profiles import TeamStrategyAnalyzer
-            team_analyzer = TeamStrategyAnalyzer()
-            if team_analyzer.load_profiles():
-                print(f"{Colors.GREEN}✓ Team profiles loaded (10 teams){Colors.ENDC}")
-            else:
-                print(f"{Colors.YELLOW}⚠️  Team profiles not available{Colors.ENDC}")
-        except Exception as e:
-            print(f"{Colors.YELLOW}⚠️  Team analyzer error: {e}{Colors.ENDC}")
-        
-        print("\nTesting track features...")
+        print("Testing track features...")
         bahrain = TrackFeatures.get_track_info('Bahrain')
         print(f"{Colors.GREEN}✓ Track database working{Colors.ENDC}")
         
@@ -344,128 +286,11 @@ def run_tests():
         print(f"{Colors.GREEN}✓ Strategy optimizer working ({len(strategies)} strategies){Colors.ENDC}")
         
         print(f"\n{Colors.GREEN}{Colors.BOLD}✓ ALL TESTS PASSED{Colors.ENDC}")
-        print(f"\n{Colors.CYAN}System Status:{Colors.ENDC}")
-        print(f"  Model Version: v3.1.0")
-        print(f"  ML Accuracy: 83.3% strategy, 100.0% pit lap")
-        print(f"  Ready for predictions: ✅")
         return True
         
     except Exception as e:
         print(f"{Colors.RED}✗ Test failed: {e}{Colors.ENDC}")
-        import traceback
-        traceback.print_exc()
         return False
-
-
-def run_training():
-    """Train or retrain ML models."""
-    print(f"{Colors.BOLD}🎓 Training ML Models (v3.1.0){Colors.ENDC}\n")
-    
-    try:
-        print(f"{Colors.CYAN}Training enhanced ensemble model...{Colors.ENDC}\n")
-        
-        # Run training script
-        result = subprocess.run(
-            [sys.executable, 'train_enhanced_ml.py'],
-            capture_output=False,
-            text=True
-        )
-        
-        if result.returncode == 0:
-            print(f"\n{Colors.GREEN}✓ Enhanced ML model trained successfully{Colors.ENDC}")
-            
-            # Also train v3 features
-            print(f"\n{Colors.CYAN}Training v3.0 features (driver/team analysis)...{Colors.ENDC}\n")
-            result2 = subprocess.run(
-                [sys.executable, 'train_v3_features.py'],
-                capture_output=False,
-                text=True
-            )
-            
-            if result2.returncode == 0:
-                print(f"\n{Colors.GREEN}✓ All models trained successfully!{Colors.ENDC}")
-                print(f"\n{Colors.CYAN}Next steps:{Colors.ENDC}")
-                print(f"  1. Test system: python app.py --test")
-                print(f"  2. Validate: python app.py --validate")
-                print(f"  3. Predict: python app.py")
-                return True
-            else:
-                print(f"{Colors.YELLOW}⚠️  v3 features training completed with warnings{Colors.ENDC}")
-                return True
-        else:
-            print(f"{Colors.RED}✗ Training failed{Colors.ENDC}")
-            return False
-            
-    except FileNotFoundError:
-        print(f"{Colors.RED}✗ Training scripts not found{Colors.ENDC}")
-        print(f"  Make sure train_enhanced_ml.py exists")
-        return False
-    except Exception as e:
-        print(f"{Colors.RED}✗ Training error: {e}{Colors.ENDC}")
-        return False
-
-
-def run_validation():
-    """Validate ML model performance."""
-    print(f"{Colors.BOLD}📊 Validating ML Model Performance{Colors.ENDC}\n")
-    
-    try:
-        # Run validation script
-        result = subprocess.run(
-            [sys.executable, 'validate_enhanced_ml.py'],
-            capture_output=False,
-            text=True
-        )
-        
-        if result.returncode == 0:
-            print(f"\n{Colors.GREEN}✓ Validation complete{Colors.ENDC}")
-            return True
-        else:
-            print(f"{Colors.RED}✗ Validation failed{Colors.ENDC}")
-            return False
-            
-    except FileNotFoundError:
-        print(f"{Colors.RED}✗ Validation script not found{Colors.ENDC}")
-        print(f"  Make sure validate_enhanced_ml.py exists")
-        return False
-    except Exception as e:
-        print(f"{Colors.RED}✗ Validation error: {e}{Colors.ENDC}")
-        return False
-
-
-def show_version():
-    """Show version information."""
-    print(f"""
-{Colors.BOLD}F1 Race Prediction System{Colors.ENDC}
-
-{Colors.CYAN}Version:{Colors.ENDC} 3.1.0
-{Colors.CYAN}Release:{Colors.ENDC} November 2025
-
-{Colors.CYAN}Features:{Colors.ENDC}
-  • Enhanced ML Ensemble (RF + GB + AdaBoost)
-  • 72 training samples (2023-2025 seasons)
-  • 12 enhanced features
-  • Driver performance ratings (21 drivers)
-  • Team strategy profiles (10 teams)
-  • Real 2025 season data
-
-{Colors.CYAN}Performance:{Colors.ENDC}
-  • Strategy Accuracy: 83.3%
-  • Pit Lap Accuracy: 100.0%
-  • Cross-validation: 79.2%
-  • Training Speed: <1 second
-  • Prediction Speed: <50ms
-
-{Colors.CYAN}Dependencies:{Colors.ENDC}
-  • Python 3.14
-  • scikit-learn 1.7.2
-  • fastf1 3.6.1
-  • numpy 2.3.4
-  • pandas 2.3.3
-  • scipy 1.16.3
-
-{Colors.CYAN}GitHub:{Colors.ENDC} https://github.com/EgemenAnil/f1strat
-""")
 
 def run_prediction():
     """Run race prediction."""
@@ -512,63 +337,74 @@ def run_prediction():
         return False
     
     try:
-        # Import prediction pipeline
-        from predict_upcoming_race import F1RacePredictionPipeline
+        # Import required modules
+        from src.models.strategy_optimizer import StrategyOptimizer
+        import fastf1
+        import pandas as pd
+        from datetime import datetime
         
-        print(f"{Colors.CYAN}🔮 Initializing prediction system...{Colors.ENDC}\n")
+        # Get next race
+        print(f"\n{Colors.CYAN}📅 Finding next F1 race...{Colors.ENDC}")
+        current_year = datetime.now().year
+        schedule = fastf1.get_event_schedule(current_year)
+        today = pd.Timestamp.now()
         
-        # Create pipeline
-        pipeline = F1RacePredictionPipeline()
+        upcoming_races = schedule[schedule['EventDate'] > today]
+        if upcoming_races.empty:
+            print(f"{Colors.YELLOW}⚠️  No upcoming races in {current_year}{Colors.ENDC}")
+            return False
         
-        # Run prediction
-        prediction = pipeline.predict_upcoming_race()
+        next_race = upcoming_races.iloc[0]
+        race_name = next_race['EventName']
+        race_date = next_race['EventDate']
+        circuit_name = next_race['Location']
         
-        if prediction:
-            # Print prediction
-            pipeline.print_prediction(prediction)
+        print(f"{Colors.GREEN}✓ Next race: {race_name}{Colors.ENDC}")
+        print(f"   📍 Location: {circuit_name}")
+        print(f"   📅 Date: {race_date.strftime('%B %d, %Y')}")
+        print(f"   ⏰ Days until race: {(race_date - today).days}")
+        
+        # Get track name for strategy optimizer
+        track_mapping = {
+            'Bahrain': 'Bahrain', 'Saudi Arabia': 'Jeddah',
+            'Australia': 'Melbourne', 'Azerbaijan': 'Baku',
+            'Miami': 'Miami', 'Monaco': 'Monaco',
+            'Spain': 'Catalunya', 'Canada': 'Montreal',
+            'Austria': 'Red Bull Ring', 'Great Britain': 'Silverstone',
+            'Hungary': 'Hungaroring', 'Belgium': 'Spa',
+            'Netherlands': 'Zandvoort', 'Italy': 'Monza',
+            'Singapore': 'Singapore', 'Japan': 'Suzuka',
+            'Qatar': 'Losail', 'United States': 'Austin',
+            'Mexico': 'Mexico City', 'Brazil': 'Interlagos',
+            'Las Vegas': 'Las Vegas', 'Abu Dhabi': 'Yas Marina'
+        }
+        
+        track_name = track_mapping.get(circuit_name, circuit_name)
+        
+        # Optimize strategy
+        print(f"\n{Colors.CYAN}🔧 Optimizing pit stop strategy...{Colors.ENDC}")
+        optimizer = StrategyOptimizer(track_name=track_name, total_laps=57)  # Default 57 laps
+        strategies = optimizer.generate_strategies()
+        
+        if strategies:
+            best_strategy = strategies[0]  # Already sorted by expected time
+            print(f"\n{Colors.GREEN}✅ OPTIMAL STRATEGY:{Colors.ENDC}")
+            print(f"   Strategy: {best_strategy.name}")
+            print(f"   Compounds: {' → '.join(best_strategy.compounds)}")
+            print(f"   Pit laps: {best_strategy.pit_laps}")
+            print(f"   Expected time: {best_strategy.expected_time:.1f}s")
+            print(f"\n{Colors.CYAN}� Strategy breakdown:{Colors.ENDC}")
+            for i, compound in enumerate(best_strategy.compounds):
+                if i < len(best_strategy.pit_laps):
+                    stint_laps = best_strategy.pit_laps[i] - (best_strategy.pit_laps[i-1] if i > 0 else 0)
+                else:
+                    last_pit = best_strategy.pit_laps[-1] if best_strategy.pit_laps else 0
+                    stint_laps = 57 - last_pit
+                print(f"   Stint {i+1}: {compound} ({stint_laps} laps)")
             
-            # Save to JSON
-            import json
-            race_name = prediction['race_info']['race_name'].replace(' ', '_')
-            output_file = f"prediction_{race_name}.json"
-            
-            # Prepare JSON-serializable data
-            def convert_to_json_serializable(obj):
-                """Convert numpy/pandas types to JSON serializable types."""
-                import pandas as pd
-                import numpy as np
-                from datetime import datetime
-                if isinstance(obj, (pd.Timestamp, datetime)):
-                    return str(obj)
-                elif isinstance(obj, (np.integer, np.int64, np.int32)):
-                    return int(obj)
-                elif isinstance(obj, (np.floating, np.float64, np.float32)):
-                    return float(obj)
-                elif isinstance(obj, dict):
-                    return {k: convert_to_json_serializable(v) for k, v in obj.items()}
-                elif isinstance(obj, list):
-                    return [convert_to_json_serializable(i) for i in obj]
-                return obj
-            
-            json_data = {
-                'race_info': convert_to_json_serializable(prediction['race_info']),
-                'optimal_strategy': {
-                    'name': prediction['strategies']['optimal_strategy'].name,
-                    'compounds': prediction['strategies']['optimal_strategy'].compounds,
-                    'pit_laps': [int(x) for x in prediction['strategies']['optimal_strategy'].pit_laps],
-                    'expected_time': float(prediction['strategies']['optimal_strategy'].expected_time)
-                },
-                'prediction_time': prediction['prediction_time'].isoformat(),
-                'model_version': prediction['model_version']
-            }
-            
-            with open(output_file, 'w') as f:
-                json.dump(json_data, f, indent=2)
-            
-            print(f"\n{Colors.GREEN}💾 Prediction saved to: {output_file}{Colors.ENDC}")
             return True
         else:
-            print(f"{Colors.YELLOW}⚠️  No prediction generated{Colors.ENDC}")
+            print(f"{Colors.YELLOW}⚠️  Could not generate strategy{Colors.ENDC}")
             return False
             
     except Exception as e:
@@ -577,83 +413,64 @@ def run_prediction():
         traceback.print_exc()
         return False
 
-
 def show_help():
     """Show help message."""
     print(f"""
-{Colors.BOLD}F1 Race Prediction System v3.1.0 - Help{Colors.ENDC}
+{Colors.BOLD}F1 Race Prediction System - Help{Colors.ENDC}
 
 {Colors.CYAN}USAGE:{Colors.ENDC}
-    python app.py                 Predict next F1 race (default)
-    python app.py --test          Run comprehensive system tests
-    python app.py --train         Train/retrain ML models
-    python app.py --validate      Validate ML model performance
-    python app.py --version       Show version information
-    python app.py --setup         Run setup wizard
-    python app.py --help          Show this help
+    python app.py              Predict next F1 race (default)
+    python app.py --test       Run system tests
+    python app.py --setup      Run setup wizard
+    python app.py --help       Show this help
 
 {Colors.CYAN}EXAMPLES:{Colors.ENDC}
     # First time setup
     python app.py --setup
     
-    # Train ML models
-    python app.py --train
-    
     # Test installation
     python app.py --test
-    
-    # Validate model accuracy
-    python app.py --validate
     
     # Predict next race
     python app.py
 
 {Colors.CYAN}REQUIREMENTS:{Colors.ENDC}
     • Python 3.8+
-    • OpenWeatherMap API key (free, optional)
+    • OpenWeatherMap API key (free)
     • Internet connection
 
 {Colors.CYAN}SETUP STEPS:{Colors.ENDC}
     1. Run setup wizard:      python app.py --setup
-    2. Train ML models:       python app.py --train
-    3. Test system:           python app.py --test
-    4. Validate models:       python app.py --validate
+    2. Get API key:           https://openweathermap.org/api
+    3. Edit .env file:        Add your API key
+    4. Test system:           python app.py --test
     5. Run prediction:        python app.py
 
-{Colors.CYAN}ML MODELS (v3.1.0):{Colors.ENDC}
-    • Enhanced Ensemble (RF + GB + AdaBoost)
-    • Strategy Accuracy: 83.3%
-    • Pit Lap Accuracy: 100.0%
-    • Training Speed: <1 second
-
 {Colors.CYAN}FILES:{Colors.ENDC}
-    README.md             Full documentation
-    DEPENDENCIES.md       Dependency guide
-    requirements.txt      Package requirements
+    README.md          Full documentation
+    QUICKSTART.md      Quick start guide
+    FILE_GUIDE.md      File organization
     
 {Colors.CYAN}TROUBLESHOOTING:{Colors.ENDC}
     If prediction fails:
-    1. Train models:          python app.py --train
-    2. Test system:           python app.py --test
-    3. Check .env file has API key (optional)
-    4. See DEPENDENCIES.md for details
+    1. Check .env file has API key
+    2. Run: python app.py --test
+    3. Check internet connection
+    4. See README.md for details
 
 {Colors.CYAN}MORE INFO:{Colors.ENDC}
     GitHub: https://github.com/EgemenAnil/f1strat
-    Docs:   See README.md and DEPENDENCIES.md
+    Docs:   See README.md
 """)
 
 def main():
     """Main application entry point."""
     parser = argparse.ArgumentParser(
-        description='F1 Race Prediction System v3.1.0',
+        description='F1 Race Prediction System',
         add_help=False
     )
     parser.add_argument('--setup', action='store_true', help='Run setup wizard')
     parser.add_argument('--test', action='store_true', help='Run system tests')
-    parser.add_argument('--train', action='store_true', help='Train ML models')
-    parser.add_argument('--validate', action='store_true', help='Validate ML performance')
-    parser.add_argument('--version', action='store_true', help='Show version info')
     parser.add_argument('--help', action='store_true', help='Show help')
     
     args = parser.parse_args()
@@ -662,23 +479,13 @@ def main():
     
     if args.help:
         show_help()
-    elif args.version:
-        show_version()
     elif args.setup:
         run_setup_wizard()
     elif args.test:
         run_tests()
-    elif args.train:
-        run_training()
-    elif args.validate:
-        run_validation()
     else:
         # Check if first time setup is needed
         issues = check_setup()
-        
-        # Check if models are trained
-        from pathlib import Path
-        ml_model_exists = Path('./models/enhanced_ml_model.pkl').exists()
         
         if issues:
             print(f"{Colors.YELLOW}⚠️  Setup incomplete:{Colors.ENDC}")
@@ -689,22 +496,11 @@ def main():
             
             # Auto-run setup wizard
             if run_setup_wizard():
-                print(f"\n{Colors.CYAN}Setup complete!{Colors.ENDC}")
-                if not ml_model_exists:
-                    print(f"\n{Colors.CYAN}Training ML models for first time...{Colors.ENDC}")
-                    run_training()
-                print(f"\n{Colors.CYAN}Run 'python app.py' again to predict.{Colors.ENDC}")
+                print(f"\n{Colors.CYAN}Setup complete! Run 'python app.py' again to predict.{Colors.ENDC}")
             else:
                 print(f"\n{Colors.RED}Setup failed. Please run 'python app.py --setup' manually.{Colors.ENDC}")
-        elif not ml_model_exists:
-            print(f"{Colors.YELLOW}⚠️  ML models not trained{Colors.ENDC}")
-            print(f"\n{Colors.CYAN}Training models for first time...{Colors.ENDC}\n")
-            if run_training():
-                print(f"\n{Colors.CYAN}Training complete! Run 'python app.py' again to predict.{Colors.ENDC}")
-            else:
-                print(f"\n{Colors.RED}Training failed. Please run 'python app.py --train' manually.{Colors.ENDC}")
         else:
-            # Setup OK and models trained, run prediction
+            # Setup OK, run prediction
             run_prediction()
 
 if __name__ == "__main__":

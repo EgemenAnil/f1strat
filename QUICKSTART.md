@@ -1,32 +1,108 @@
-# 🚀 Quick Start Guide - F1 Race Prediction System
+# 🏎️ F1 Strategy System v3.1.0 - Quick Start Guide
 
-Get up and running in **5 minutes** with a **single command**!
+Get started with F1 race predictions in 3 minutes!
+
+---
+
+## ⚡ Fast Track (3 Commands)
+
+```bash
+# 1. Setup & install dependencies
+python app.py --setup
+
+# 2. Train ML models
+python app.py --train
+
+# 3. Predict next race
+python app.py
+```
+
+Done! You now have AI-powered F1 race predictions 🎉
 
 ## Prerequisites
 
 - ✅ Python 3.8 or higher
 - ✅ Internet connection
-- ✅ OpenWeatherMap API key (free)
+- ✅ That's it! (Dependencies auto-install)
 
 ## Super Quick Start ⚡
 
-### One Command Setup & Run:
+### ONE COMMAND - That's All! 🎉
 
 ```bash
-# 1. Run setup wizard (first time only)
-python app.py --setup
-
-# 2. Edit .env file and add your API key
-# Get free key from: https://openweathermap.org/api
-
-# 3. Test everything
-python app.py --test
-
-# 4. Predict next race!
+# Just run this - it does everything automatically!
 python app.py
 ```
 
-That's it! 🎉
+**Yes, really!** The system will:
+1. ✅ Check for required packages
+2. ✅ Auto-install missing dependencies (first time only)
+3. ✅ Download F1 data
+4. ✅ Show predictions
+
+**First run:** ~2-5 minutes (one-time setup)  
+**Subsequent runs:** ~30 seconds
+
+---
+
+## What Happens Behind the Scenes
+
+### First Time Running:
+```bash
+python app.py
+```
+
+Output:
+```
+================================================================================
+🔧 FIRST-TIME SETUP: Installing required dependencies...
+================================================================================
+
+Missing packages: 6
+This is a one-time setup that will take 2-5 minutes.
+
+📦 Installing pandas>=2.0.0...
+   ✅ pandas>=2.0.0 installed
+📦 Installing numpy>=1.24.0...
+   ✅ numpy>=1.24.0 installed
+📦 Installing fastf1>=3.6.0...
+   ✅ fastf1>=3.6.0 installed
+...
+
+✅ All dependencies installed successfully!
+================================================================================
+
+🏎️ F1 RACE PREDICTION SYSTEM v2.3
+... (continues with predictions)
+```
+
+### Every Other Time:
+```bash
+python app.py
+```
+
+Instantly starts (dependencies already installed)!
+
+---
+
+## Old Way vs New Way
+
+### ❌ Old Way (Manual):
+```bash
+git clone https://github.com/EgemenAnil/f1strat.git
+cd f1strat
+pip install -r requirements.txt  # ← User has to know this
+python app.py
+```
+
+### ✅ New Way (Automatic):
+```bash
+git clone https://github.com/EgemenAnil/f1strat.git
+cd f1strat
+python app.py  # ← That's it!
+```
+
+**50% fewer steps! 🎉**
 
 ---
 
