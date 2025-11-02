@@ -33,7 +33,7 @@ class F1DataFetcher:
     
     def get_upcoming_race(self) -> Optional[Dict]:
         """
-        Get information about the next upcoming F1 race.
+        Get information about the next upcoming F1 race (including today).
         
         Returns:
             Dictionary with race details or None if no upcoming race
@@ -42,32 +42,68 @@ class F1DataFetcher:
             current_year = datetime.now().year
             schedule = fastf1.get_event_schedule(current_year)
             
-            today = pd.Timestamp.now()
-            upcoming_races = schedule[schedule['Session5Date'] > today]
+            # Get today's date at midnight (start of day)
+            today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            today = pd.Timestamp(today)
+            
+            # Find races from today onwards
+            upcoming_races = []
+            for idx, race in schedule.iterrows():
+                race_date = pd.Timestamp(race['Session5Date'])
+                
+                # Skip if date is NaT (Not a Time)
+                if pd.isna(race_date):
+                    continue
+                    
+                # Remove timezone info for comparison
+                if race_date.tz is not None:
+                    race_date = race_date.tz_localize(None)
+                if today.tz is not None:
+                    today = today.tz_localize(None)
+                    
+                # Compare dates only
+                if race_date.date() >= today.date():
+                    upcoming_races.append(race)
             
             if len(upcoming_races) == 0:
                 # Try next year
                 schedule = fastf1.get_event_schedule(current_year + 1)
-                upcoming_races = schedule[schedule['Session5Date'] > today]
+                for idx, race in schedule.iterrows():
+                    race_date = pd.Timestamp(race['Session5Date'])
+                    
+                    # Skip if date is NaT
+                    if pd.isna(race_date):
+                        continue
+                        
+                    if race_date.tz is not None:
+                        race_date = race_date.tz_localize(None)
+                    if race_date.date() >= today.date():
+                        upcoming_races.append(race)
             
             if len(upcoming_races) > 0:
-                next_race = upcoming_races.iloc[0]
+                next_race = upcoming_races[0]
                 return {
-                    'year': next_race['EventDate'].year,
+                    'year': pd.Timestamp(next_race['EventDate']).year,
                     'round': next_race['RoundNumber'],
                     'country': next_race['Country'],
                     'location': next_race['Location'],
                     'event_name': next_race['EventName'],
+                    'race_name': next_race['EventName'],  # For compatibility
+                    'circuit': next_race['Location'],  # For compatibility
+                    'date': next_race['Session5Date'],  # For compatibility
                     'race_date': next_race['Session5Date'],
                     'quali_date': next_race['Session4Date'],
                     'fp1_date': next_race['Session1Date'],
                     'fp2_date': next_race['Session2Date'],
                     'fp3_date': next_race['Session3Date'],
+                    'total_laps': 57,  # Default, will be updated with actual data
                 }
             return None
             
         except Exception as e:
             print(f"Error fetching upcoming race: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def get_historical_race_data(self, year: int, race: str, 
@@ -260,6 +296,7 @@ TRACK_COORDINATES = {
     'United States': {'lat': 30.1328, 'lon': -97.6411},
     'Mexico': {'lat': 19.4042, 'lon': -99.0907},
     'Brazil': {'lat': -23.7036, 'lon': -46.6997},
+    'São Paulo': {'lat': -23.7036, 'lon': -46.6997},  # Interlagos
     'Las Vegas': {'lat': 36.1147, 'lon': -115.1728},
     'Abu Dhabi': {'lat': 24.4672, 'lon': 54.6031},
 }

@@ -76,11 +76,55 @@ def run_setup_wizard():
         return False
     
     print("\nStep 2: Installing dependencies...")
-    print("Run: pip install -r requirements.txt")
-    response = input(f"\n{Colors.YELLOW}Install now? (y/n): {Colors.ENDC}")
-    if response.lower() == 'y':
-        os.system("pip install -r requirements.txt --quiet")
-        print(f"{Colors.GREEN}✓ Dependencies installed{Colors.ENDC}")
+    
+    # Check if packages are missing
+    missing_packages = []
+    try:
+        import pandas
+    except ImportError:
+        missing_packages.append('pandas')
+    try:
+        import numpy
+    except ImportError:
+        missing_packages.append('numpy')
+    try:
+        import fastf1
+    except ImportError:
+        missing_packages.append('fastf1')
+    try:
+        import sklearn
+    except ImportError:
+        missing_packages.append('scikit-learn')
+    
+    if missing_packages:
+        print(f"{Colors.YELLOW}Missing packages: {', '.join(missing_packages)}{Colors.ENDC}")
+        print("Run: pip install -r requirements.txt")
+        response = input(f"\n{Colors.YELLOW}Install now? (y/n): {Colors.ENDC}")
+        if response.lower() == 'y':
+            print(f"\n{Colors.CYAN}Installing packages...{Colors.ENDC}")
+            
+            # Try pip3 first, then pip
+            install_cmd = None
+            if os.system("which pip3 > /dev/null 2>&1") == 0:
+                install_cmd = "pip3 install -r requirements.txt"
+            elif os.system("which pip > /dev/null 2>&1") == 0:
+                install_cmd = "pip install -r requirements.txt"
+            else:
+                print(f"{Colors.RED}✗ pip not found. Please install manually:{Colors.ENDC}")
+                print(f"   python3 -m pip install -r requirements.txt")
+                return False
+            
+            result = os.system(install_cmd)
+            if result == 0:
+                print(f"{Colors.GREEN}✓ Dependencies installed{Colors.ENDC}")
+            else:
+                print(f"{Colors.RED}✗ Installation failed. Try manually:{Colors.ENDC}")
+                print(f"   {install_cmd}")
+                return False
+        else:
+            print(f"{Colors.YELLOW}⚠️  Skipped - Install manually later{Colors.ENDC}")
+    else:
+        print(f"{Colors.GREEN}✓ All required packages installed{Colors.ENDC}")
     
     print("\nStep 3: Setting up environment...")
     env_path = Path('.env')
@@ -245,6 +289,18 @@ def run_prediction():
             output_file = f"prediction_{race_name}.json"
             
             import json
+            import pandas as pd
+            
+            # Convert Timestamps to strings for JSON serialization
+            def convert_timestamps(obj):
+                if isinstance(obj, pd.Timestamp):
+                    return str(obj)
+                elif isinstance(obj, dict):
+                    return {k: convert_timestamps(v) for k, v in obj.items()}
+                elif isinstance(obj, list):
+                    return [convert_timestamps(item) for item in obj]
+                return obj
+            
             with open(output_file, 'w') as f:
                 json_prediction = {
                     k: v for k, v in prediction.items()
@@ -259,6 +315,10 @@ def run_prediction():
                     }
                     for level, strat in prediction['optimal_strategies'].items()
                 }
+                
+                # Convert all Timestamps
+                json_prediction = convert_timestamps(json_prediction)
+                
                 json.dump(json_prediction, f, indent=2)
             
             print(f"\n{Colors.GREEN}💾 Prediction saved to: {output_file}{Colors.ENDC}")

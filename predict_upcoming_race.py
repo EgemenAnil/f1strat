@@ -161,8 +161,8 @@ class F1RacePredictionPipeline:
         """Get weather forecast for race."""
         try:
             # Get track coordinates
-            from src.data.fetcher import F1DataFetcher
-            coords = F1DataFetcher.TRACK_COORDINATES.get(race_info['circuit'])
+            from src.data.fetcher import TRACK_COORDINATES
+            coords = TRACK_COORDINATES.get(race_info['circuit'])
             
             if coords:
                 weather = self.fetcher.get_weather_forecast(
@@ -171,6 +171,8 @@ class F1RacePredictionPipeline:
                     race_info['date']
                 )
                 return weather
+            else:
+                print(f"  Warning: Coordinates not found for {race_info['circuit']}")
         except Exception as e:
             print(f"  Warning: Could not fetch weather forecast: {e}")
         
