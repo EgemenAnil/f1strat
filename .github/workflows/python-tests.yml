@@ -1,0 +1,62 @@
+name: Python Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache pip packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run import tests
+      run: |
+        python -c "from src.features.engineering import F1FeatureEngineer; print('✓ Features OK')"
+        python -c "from src.features.track_features import TrackFeatures; print('✓ Tracks OK')"
+        python -c "from src.models.strategy_optimizer import StrategyOptimizer; print('✓ Strategy OK')"
+        python -c "from src.models.crash_predictor import CrashPredictor; print('✓ Crash predictor OK')"
+    
+    - name: Test track database
+      run: |
+        python -c "from src.features.track_features import TrackFeatures; assert TrackFeatures.get_track_info('Monaco') is not None; print('✓ Track DB OK')"
+    
+    - name: Test strategy generation
+      run: |
+        python -c "from src.models.strategy_optimizer import StrategyOptimizer; s = StrategyOptimizer(57); assert len(s.generate_strategies({'temperature': 25, 'rain_probability': 0.2})) > 0; print('✓ Strategies OK')"
+    
+    - name: Test crash prediction
+      run: |
+        python -c "from src.models.crash_predictor import CrashPredictor; p = CrashPredictor(); r = p.analyze_track_risk('Monaco'); assert r['risk_category'] == 'Very High'; print('✓ Crash prediction OK')"
+    
+    - name: Code quality check
+      run: |
+        pip install flake8
+        # Stop build if there are Python syntax errors or undefined names
+        flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 src/ --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics

@@ -1,0 +1,141 @@
+# Simulation Configuration for F1 Race Prediction
+
+# General Simulation Settings
+simulation:
+  default_total_laps: 57
+  monte_carlo_iterations: 100
+  confidence_level: 0.95
+
+# Pit Stop Settings
+pit_stops:
+  base_time_seconds: 22.0
+  variation_std_seconds: 1.5
+  min_pit_stops: 1
+  max_pit_stops: 3
+  min_compounds_required: 2
+
+# Tire Compound Parameters
+compounds:
+  SOFT:
+    base_pace_delta: 0.0  # Reference (fastest)
+    degradation_rate: 0.08
+    optimal_stint_length: 18
+    max_stint_length: 25
+    warmup_laps: 2
+    warmup_penalty: 0.5
+    
+  MEDIUM:
+    base_pace_delta: 0.3  # 0.3s slower than SOFT
+    degradation_rate: 0.05
+    optimal_stint_length: 28
+    max_stint_length: 40
+    warmup_laps: 2
+    warmup_penalty: 0.3
+    
+  HARD:
+    base_pace_delta: 0.6  # 0.6s slower than SOFT
+    degradation_rate: 0.03
+    optimal_stint_length: 40
+    max_stint_length: 57
+    warmup_laps: 3
+    warmup_penalty: 0.4
+    
+  INTERMEDIATE:
+    base_pace_delta: 2.0  # Much slower in dry
+    degradation_rate: 0.06
+    optimal_stint_length: 25
+    max_stint_length: 35
+    warmup_laps: 1
+    warmup_penalty: 0.2
+    rain_performance_boost: -5.0  # Faster in wet
+    
+  WET:
+    base_pace_delta: 3.0  # Very slow in dry
+    degradation_rate: 0.07
+    optimal_stint_length: 20
+    max_stint_length: 30
+    warmup_laps: 1
+    warmup_penalty: 0.1
+    rain_performance_boost: -8.0  # Much faster in heavy rain
+
+# Realism Factors
+realism:
+  # Fuel effect
+  enable_fuel_effect: true
+  fuel_weight_per_lap: 1.6  # kg
+  fuel_time_penalty_per_kg: 0.035  # seconds
+  
+  # Tire warmup
+  enable_tire_warmup: true
+  
+  # Traffic
+  enable_traffic: true
+  traffic_base_probability: 0.15
+  traffic_delay_seconds: 0.8
+  traffic_variation: 0.3
+  
+  # Track evolution
+  enable_track_evolution: true
+  track_evolution_rate: 0.002  # seconds improvement per lap
+  
+  # Pit stop variation
+  enable_pit_variation: true
+  
+  # Random lap variation
+  enable_random_variation: true
+  random_variation_std: 0.15
+
+# Weather Impact
+weather:
+  temperature_optimal: 22  # Celsius
+  temperature_penalty_per_degree: 0.01
+  
+  rain_probability_thresholds:
+    dry: 0.2
+    damp: 0.5
+    wet: 0.8
+  
+  rain_penalties:
+    dry_tires_in_rain: 5.0  # seconds per lap
+    wet_tires_in_dry: 3.0
+  
+  wind_impact_threshold: 30  # km/h
+  wind_penalty_per_kmh: 0.02
+
+# Strategy Optimization
+optimization:
+  algorithm: 'monte_carlo'  # 'monte_carlo', 'genetic', 'gradient_descent'
+  
+  monte_carlo:
+    num_simulations: 100
+    random_seed: 42
+  
+  genetic:
+    population_size: 50
+    generations: 100
+    mutation_rate: 0.1
+    crossover_rate: 0.8
+  
+  constraints:
+    min_stint_length: 5
+    max_stint_length: 57
+    pit_window_start: 5
+    pit_window_end: 52
+
+# Risk Profiles
+risk_profiles:
+  conservative:
+    prefer_fewer_stops: true
+    prefer_harder_compounds: true
+    safety_margin: 3  # laps
+  
+  balanced:
+    prefer_fewer_stops: false
+    prefer_harder_compounds: false
+    safety_margin: 2
+  
+  aggressive:
+    prefer_fewer_stops: false
+    prefer_harder_compounds: false
+    safety_margin: 0
+    allow_risky_strategies: true

@@ -1,11 +1,39 @@
-# Önbellek dosyalarını görmezden gel
+# Cache files
 cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
 
-# CSV dosyalarını görmezden gel
-*.csv
-
-# Python sanal ortam klasörünü görmezden gel
+# Environment files
+.env
 f1-env/
+venv/
+env/
 
-# Mac'e özel sistem dosyaları
+# Data files (keep historical_data/ but ignore new CSVs)
+*.csv
+!historical_data/*.csv
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Mac system files
 .DS_Store
+
+# Model files (large binary files)
+*.pkl
+*.h5
+*.pt
+*.pth
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Output files
+prediction_*.json
+*.log
