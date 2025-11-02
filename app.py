@@ -83,23 +83,61 @@ def run_setup_wizard():
         print(f"{Colors.GREEN}✓ Dependencies installed{Colors.ENDC}")
     
     print("\nStep 3: Setting up environment...")
-    if not Path('.env').exists():
+    env_path = Path('.env')
+    
+    # Create .env if doesn't exist
+    if not env_path.exists():
         if Path('.env.example').exists():
             import shutil
             shutil.copy('.env.example', '.env')
             print(f"{Colors.GREEN}✓ Created .env file{Colors.ENDC}")
-            print(f"\n{Colors.YELLOW}⚠️  Please edit .env and add your OpenWeatherMap API key{Colors.ENDC}")
-            print("   Get free API key from: https://openweathermap.org/api")
         else:
             print(f"{Colors.RED}✗ .env.example not found{Colors.ENDC}")
+            return False
     else:
         print(f"{Colors.GREEN}✓ .env file exists{Colors.ENDC}")
     
-    print(f"\n{Colors.GREEN}Setup complete!{Colors.ENDC}")
+    # Interactive API key setup
+    print(f"\n{Colors.BOLD}Step 4: OpenWeatherMap API Key{Colors.ENDC}")
+    print("Weather forecasts require a free API key from OpenWeatherMap")
+    print(f"{Colors.CYAN}Get your free key: https://openweathermap.org/api{Colors.ENDC}")
+    
+    # Check if API key already set
+    with open(env_path) as f:
+        env_content = f.read()
+    
+    if 'your_api_key_here' in env_content:
+        print(f"\n{Colors.YELLOW}Current: API key not set{Colors.ENDC}")
+        api_key = input(f"\nEnter your API key (or press Enter to skip): {Colors.ENDC}").strip()
+        
+        if api_key:
+            # Update .env file
+            env_content = env_content.replace('OPENWEATHER_API_KEY=your_api_key_here', 
+                                             f'OPENWEATHER_API_KEY={api_key}')
+            with open(env_path, 'w') as f:
+                f.write(env_content)
+            print(f"{Colors.GREEN}✓ API key saved to .env{Colors.ENDC}")
+        else:
+            print(f"{Colors.YELLOW}⚠️  Skipped - You can add it later by editing .env file{Colors.ENDC}")
+    else:
+        print(f"{Colors.GREEN}✓ API key already configured{Colors.ENDC}")
+        update = input(f"\n{Colors.YELLOW}Update API key? (y/n): {Colors.ENDC}")
+        if update.lower() == 'y':
+            api_key = input(f"Enter new API key: {Colors.ENDC}").strip()
+            if api_key:
+                # Find and replace existing API key
+                import re
+                env_content = re.sub(r'OPENWEATHER_API_KEY=.*', 
+                                    f'OPENWEATHER_API_KEY={api_key}', 
+                                    env_content)
+                with open(env_path, 'w') as f:
+                    f.write(env_content)
+                print(f"{Colors.GREEN}✓ API key updated{Colors.ENDC}")
+    
+    print(f"\n{Colors.GREEN}{Colors.BOLD}✓ Setup complete!{Colors.ENDC}")
     print(f"\nNext steps:")
-    print(f"1. Edit .env file and add your API key")
-    print(f"2. Run: python app.py --test")
-    print(f"3. Run: python app.py")
+    print(f"1. Run: python app.py --test  {Colors.CYAN}(recommended){Colors.ENDC}")
+    print(f"2. Run: python app.py         {Colors.CYAN}(predict next race){Colors.ENDC}")
     
     return True
 
@@ -152,11 +190,42 @@ def run_prediction():
     """Run race prediction."""
     print(f"{Colors.BOLD}🔮 Running Race Prediction{Colors.ENDC}\n")
     
-    # Check setup
+    # Check if API key is missing
+    env_file = Path('.env')
+    if env_file.exists():
+        with open(env_file) as f:
+            content = f.read()
+            if 'your_api_key_here' in content:
+                print(f"{Colors.YELLOW}⚠️  OpenWeatherMap API key not configured{Colors.ENDC}")
+                print(f"Weather forecasts will use historical data instead of real-time forecasts.\n")
+                
+                response = input(f"{Colors.CYAN}Would you like to add your API key now? (y/n): {Colors.ENDC}").strip().lower()
+                
+                if response == 'y':
+                    print(f"\n{Colors.CYAN}Get your free API key: https://openweathermap.org/api{Colors.ENDC}")
+                    api_key = input(f"Enter your API key: {Colors.ENDC}").strip()
+                    
+                    if api_key:
+                        # Update .env file
+                        content = content.replace('OPENWEATHER_API_KEY=your_api_key_here', 
+                                                 f'OPENWEATHER_API_KEY={api_key}')
+                        with open(env_file, 'w') as f:
+                            f.write(content)
+                        print(f"{Colors.GREEN}✓ API key saved!{Colors.ENDC}\n")
+                    else:
+                        print(f"{Colors.YELLOW}Skipped - continuing with historical data{Colors.ENDC}\n")
+                else:
+                    print(f"{Colors.YELLOW}Continuing with historical data...{Colors.ENDC}\n")
+    
+    # Check other setup issues
     issues = check_setup()
-    if issues:
+    
+    # Filter out API key warning (we already handled it)
+    critical_issues = [i for i in issues if 'API key' not in i]
+    
+    if critical_issues:
         print(f"{Colors.YELLOW}⚠️  Setup incomplete:{Colors.ENDC}")
-        for issue in issues:
+        for issue in critical_issues:
             print(f"   • {issue}")
         print(f"\n{Colors.CYAN}Run: python app.py --setup{Colors.ENDC}")
         return False
@@ -275,8 +344,24 @@ def main():
     elif args.test:
         run_tests()
     else:
-        # Default: run prediction
-        run_prediction()
+        # Check if first time setup is needed
+        issues = check_setup()
+        
+        if issues:
+            print(f"{Colors.YELLOW}⚠️  Setup incomplete:{Colors.ENDC}")
+            for issue in issues:
+                print(f"   • {issue}")
+            
+            print(f"\n{Colors.BOLD}Running setup wizard...{Colors.ENDC}\n")
+            
+            # Auto-run setup wizard
+            if run_setup_wizard():
+                print(f"\n{Colors.CYAN}Setup complete! Run 'python app.py' again to predict.{Colors.ENDC}")
+            else:
+                print(f"\n{Colors.RED}Setup failed. Please run 'python app.py --setup' manually.{Colors.ENDC}")
+        else:
+            # Setup OK, run prediction
+            run_prediction()
 
 if __name__ == "__main__":
     main()
