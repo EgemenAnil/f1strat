@@ -212,6 +212,11 @@ class DriverPerformanceAnalyzer:
     def save_ratings(self, filepath: str = './models/driver_ratings_2025.pkl'):
         """Save ratings to file"""
         import pickle
+        import os
+        
+        # Create models directory if it doesn't exist
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        
         with open(filepath, 'wb') as f:
             pickle.dump(self.driver_ratings, f)
         print(f"💾 Driver ratings saved: {filepath}")

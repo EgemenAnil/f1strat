@@ -274,6 +274,11 @@ class TeamStrategyAnalyzer:
     def save_profiles(self, filepath: str = './models/team_profiles_2025.pkl'):
         """Save profiles to file"""
         import pickle
+        import os
+        
+        # Create models directory if it doesn't exist
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        
         with open(filepath, 'wb') as f:
             pickle.dump(self.team_profiles, f)
         print(f"💾 Team profiles saved: {filepath}")

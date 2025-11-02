@@ -5,6 +5,7 @@ Enhanced ML Training - Phase 1-3 Implementation
 - Ensemble methods (RF + XGBoost + GB)
 """
 
+import os
 import numpy as np
 import pandas as pd
 import pickle
@@ -299,6 +300,9 @@ class EnhancedMLPredictor:
     
     def save(self, filepath='./models/enhanced_ml_model.pkl'):
         """Save enhanced model"""
+        # Create models directory if it doesn't exist
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        
         with open(filepath, 'wb') as f:
             pickle.dump({
                 'strategy_ensemble': self.strategy_ensemble,
